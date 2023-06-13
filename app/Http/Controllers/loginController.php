@@ -38,6 +38,10 @@ class loginController extends Controller
         ])->onlyInput('email');
     }
 
+    public function logout(){
+        
+    }
+
     /**
      * Store a newly created resource in storage.
      */
