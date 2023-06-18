@@ -11,13 +11,13 @@
                             <form action="{{ route('rechercherdepute') }}" method="GET">
                                 @csrf
                                 <div class="input-group ">
-                                    <input id="nom" name="nom" type="search" class="form-control" placeholder="Trouver un sénateur" aria-label="Recipient's username" aria-describedby="button-addon2">
+                                    <input id="nom" name="nom" type="search" class="form-control" placeholder="Rechercher un député" aria-label="Recipient's username" aria-describedby="button-addon2">
                                     <button class="btn btn-primary" id="button-addon2"><i class="bi bi-search"></i></button>
                                 </div>
                            </form>
                         </div>
                         <div class="col-lg-3"></div>
-                        <form action="{{ route('dodo') }}" method="POST">
+                        <form action="{{ route('filtredepute') }}" method="POST">
                             @csrf
                             <div class="row">
                                 <div class="col-lg-1"></div>

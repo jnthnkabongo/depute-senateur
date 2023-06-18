@@ -14,12 +14,18 @@ class ProvinceController extends Controller
 {
     /**
      * Display a listing of the resource.
+     * git init
+    * git add README.md
+    * git commit -m "first commit"
+    * git branch -M main
+    * git remote add origin https://github.com/jnthnkabongo/essaie.git
+    * git push -u origin main
      */
     public function index()
     {
-        $province = province::all();
-        $circonscription = circonscription::all();
-        $sigle = sigle::all();
+        $province = province::all()->sortBy('nom_prov');
+        $circonscription = circonscription::all()->sortBy('nom_circons');
+        $sigle = sigle::all()->sortBy('nom_sigle');
         $sexe = utilisateur::distinct()->get('sexe');
         //$resultfomction = parlements::paginate(10);
         $resultfomction = DB::table('utilisateurs')->
@@ -32,9 +38,9 @@ class ProvinceController extends Controller
         return view('pages.depute', compact('resultfomction', 'province', 'sigle', 'sexe'));
     }
     public function rechercherdepute(){
-        $province = province::all();
-        $circonscription = circonscription::all();
-        $sigle = sigle::all();
+        $province = province::all()->sortBy('nom_prov');
+        $circonscription = circonscription::all()->sortBy('nom_circons');
+        $sigle = sigle::all()->sortBy('nom_sigle');
         $sexe = utilisateur::distinct()->get('sexe');
         $nom = $_GET['nom'];
         $resultfomction = DB::table('utilisateurs')->
@@ -45,6 +51,108 @@ class ProvinceController extends Controller
         where('fonctions.fonction_id', 2)->
         where('utilisateurs.nom_uti','LIKE', '%'.$nom.'%')->paginate(10);
         return view('pages.depute', compact('resultfomction', 'province', 'sigle', 'sexe'));
+    }
+    public function filtresdepute(Request $request){
+        $province = province::all()->sortBy('nom_prov');
+        $circonscription = circonscription::all()->sortBy('nom_circons');
+        $sigle = sigle::all()->sortBy('nom_sigle');
+        $sexe = utilisateur::distinct()->get('sexe');
+
+        //Filtre de quatre champs choisis
+        if($request->province != 0 AND $request->circonscription != 0  AND $request->sigle != 0 AND $request->sexe != 0){
+            $resultfomction = DB::table('utilisateurs')->
+            join('fonctions', 'utilisateurs.fonction_id', '=', 'fonctions.fonction_id')-> //vrai
+            join('circonscriptions', 'utilisateurs.circons_id', '=', 'circonscriptions.circons_id')->
+            join('provinces', 'utilisateurs.province_id', '=', 'provinces.province_id')->
+            join('sigles', 'utilisateurs.sigle_id', '=', 'sigles.sigle_id')->
+            where('fonctions.fonction_id', 2)->
+            where('provinces.nom_prov', '=', $request->province)->
+            where('circonscriptions.nom_circons', '=', $request->circonscription)->
+            where('sigles.nom_sigle', '=', $request->sigle)->
+            where('utilisateurs.sexe', '=', $request->sexe)->paginate(10);
+            return view('pages.depute', compact('resultfomction', 'province', 'circonscription', 'sigle', 'sexe'));
+        }
+         //Filtre de trois champs choisis province sigle sexe
+         if( $request->province != 0  AND $request->sigle != 0  AND $request->sexe != 0){
+            $resultfomction = DB::table('utilisateurs')->
+            join('fonctions', 'utilisateurs.fonction_id', '=', 'fonctions.fonction_id')-> //vrai
+            join('circonscriptions', 'utilisateurs.circons_id', '=', 'circonscriptions.circons_id')->
+            join('provinces', 'circonscriptions.province_id', '=', 'provinces.province_id')->
+            join('sigles', 'utilisateurs.sigle_id', '=', 'sigles.sigle_id')->
+             where('fonctions.fonction_id', 2)->
+            where('provinces.nom_prov', '=', $request->province)->
+            where('sigles.nom_sigle', '=', $request->sigle)->
+            where('utilisateurs.sexe', '=', $request->sexe)->paginate(10);
+            return view('pages.depute', compact('resultfomction', 'province', 'circonscription', 'sigle', 'sexe'));
+        }
+
+        //Filtre de deux champs choisis sigle et sexe
+        if( $request->sigle != 0  AND $request->sexe != 0){
+            $resultfomction = DB::table('utilisateurs')->
+            join('circonscriptions', 'utilisateurs.circons_id', '=', 'circonscriptions.circons_id')->
+            join('sigles', 'utilisateurs.sigle_id','=' ,'sigles.sigle_id')->
+            join('fonctions', 'fonctions.fonction_id','=' ,'fonctions.fonction_id')->
+            join('provinces', 'utilisateurs.province_id', '=', 'provinces.province_id')->
+            where('sigles.nom_sigle', '=', $request->sigle)->
+            where('utilisateurs.sexe', '=', $request->sexe)->
+            paginate(10);
+            return view('pages.depute', compact('resultfomction', 'province', 'sigle', 'sexe'));
+        }
+         // Filtre d'un champ sur la province
+         if($request->province != 0){
+            $resultfomction = DB::table('utilisateurs')->
+            join('fonctions', 'utilisateurs.fonction_id', '=', 'fonctions.fonction_id')-> //vrai
+            join('circonscriptions', 'utilisateurs.circons_id', '=', 'circonscriptions.circons_id')->
+            join('provinces', 'provinces.province_id', '=', 'circonscriptions.province_id')->
+            join('sigles', 'utilisateurs.sigle_id', '=', 'sigles.sigle_id')->
+             where('fonctions.fonction_id', 2)->
+            where('provinces.nom_prov', '=', $request->province)->paginate(10);
+            return view('pages.depute', compact('resultfomction', 'province', 'sigle', 'sexe'));
+        }
+        //Filtre d'un champ sur la circonscription
+        if($request->circonscription != 0){
+            $resultfomction = DB::table('utilisateurs')->
+            join('fonctions', 'utilisateurs.uti_id', '=', 'fonctions.uti_id')-> //vrai
+            join('circonscriptions', 'utilisateurs.uti_id', '=', 'circonscriptions.uti_id')->
+            join('provinces', 'circonscriptions.province_id', '=', 'provinces.province_id')->
+            join('sigles', 'circonscriptions.circons_id', '=', 'sigles.id_circonsription')->
+            where('fonctions.fonction_id', 2)->
+            where('circonscriptions.nom_circons', '=', $request->circonscription)->paginate(10);
+            return view('pages.depute', compact('resultfomction', 'province', 'sigle', 'sexe'));
+
+        }
+        //Filtre d'un champ sur le sigle
+        if($request->sigle != 0){
+            $resultfomction = DB::table('utilisateurs')->
+            join('fonctions', 'utilisateurs.fonction_id', '=', 'fonctions.fonction_id')-> //vrai
+            join('circonscriptions', 'utilisateurs.circons_id', '=', 'circonscriptions.circons_id')->
+            join('provinces', 'circonscriptions.province_id', '=', 'provinces.province_id')->
+            join('sigles', 'utilisateurs.sigle_id', '=', 'sigles.sigle_id')->
+             where('fonctions.fonction_id', 2)->
+            where('sigles.nom_sigle', '=', $request->sigle)->paginate(10);
+            return view('pages.depute', compact('resultfomction', 'province', 'sigle', 'sexe'));
+        }
+        //
+        if($request->sexe != 0){
+            $resultfomction = DB::table('utilisateurs')->
+            join('fonctions', 'utilisateurs.fonction_id', '=', 'fonctions.fonction_id')-> //vrai
+            join('circonscriptions', 'utilisateurs.circons_id', '=', 'circonscriptions.circons_id')->
+            join('provinces', 'circonscriptions.province_id', '=', 'provinces.province_id')->
+            join('sigles', 'utilisateurs.sigle_id', '=', 'sigles.sigle_id')->
+             where('fonctions.fonction_id', 2)->
+            where('sexe', '=', $request->sexe)
+            ->paginate(10);
+            return view('pages.depute', compact('resultfomction', 'province', 'sigle', 'sexe'));
+        }
+        //
+        $resultfomction = DB::table('utilisateurs')->
+        join('fonctions', 'utilisateurs.fonction_id', '=', 'fonctions.fonction_id')-> //vrai
+            join('circonscriptions', 'utilisateurs.circons_id', '=', 'circonscriptions.circons_id')->
+            join('provinces', 'circonscriptions.province_id', '=', 'provinces.province_id')->
+            join('sigles', 'utilisateurs.sigle_id', '=', 'sigles.sigle_id')->
+             where('fonctions.fonction_id', 2)->paginate(10);
+        return view('pages.depute', compact('resultfomction', 'province', 'sigle', 'sexe'));
+
     }
 
 

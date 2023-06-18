@@ -11,7 +11,7 @@
                             <form action="{{ route('recherchernom') }}" method="GET">
                                 @csrf
                                 <div class="input-group ">
-                                    <input id="nom" name="nom" type="search" class="form-control" placeholder="Trouver un sénateur" aria-label="Recipient's username" aria-describedby="button-addon2">
+                                    <input id="nom" name="nom" type="search" class="form-control" placeholder="Rechercher un sénateur" aria-label="Recipient's username" aria-describedby="button-addon2">
                                     <button class="btn btn-primary" id="button-addon2"><i class="bi bi-search"></i></button>
                                 </div>
                            </form>

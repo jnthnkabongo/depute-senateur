@@ -16,11 +16,10 @@ class ParlementaireController extends Controller
 {
     public function index(Request $request)
     {
-        $province = province::all();
-        $circonscription = circonscription::all();
-        $sigle = sigle::all();
+        $province = province::all()->sortBy('nom_prov');
+        $circonscription = circonscription::all()->sortBy('nom_circons');
+        $sigle = sigle::all()->sortBy('nom_sigle');
         $sexe = utilisateur::distinct()->get('sexe');
-        //$resultfomction = parlements::paginate(10);
         $resultfomction = DB::table('utilisateurs')->
         join('fonctions', 'utilisateurs.fonction_id', '=', 'fonctions.fonction_id')-> //vrai
         join('circonscriptions', 'utilisateurs.circons_id', '=', 'circonscriptions.circons_id')->
@@ -39,9 +38,9 @@ class ParlementaireController extends Controller
         return response()->json($donnees);
     }
     public function recherchernom(){
-        $province = province::all();
-        $circonscription = circonscription::all();
-        $sigle = sigle::all();
+        $province = province::all()->sortBy('nom_prov');
+        $circonscription = circonscription::all()->sortBy('nom_circons');
+        $sigle = sigle::all()->sortBy('nom_sigle');
         $sexe = utilisateur::distinct()->get('sexe');
         $nom = $_GET['nom'];
         $resultfomction = DB::table('utilisateurs')->
@@ -55,9 +54,9 @@ class ParlementaireController extends Controller
     }
     public function rechercher(Request $request){
 
-        $province = province::all();
-        $circonscription = circonscription::all();
-        $sigle = sigle::all();
+        $province = province::all()->sortBy('nom_prov');
+        $circonscription = circonscription::all()->sortBy('nom_circons');
+        $sigle = sigle::all()->sortBy('nom_sigle');
         $sexe = utilisateur::distinct()->get('sexe');
         //Quatre champs
         if($request->province != 0 AND $request->circonscription != 0  AND $request->sigle != 0 AND $request->sexe != 0){
@@ -85,7 +84,7 @@ class ParlementaireController extends Controller
             join('fonctions', 'utilisateurs.fonction_id', '=', 'fonctions.fonction_id')-> //vrai
             join('provinces', 'utilisateurs.province_id', '=', 'provinces.province_id')->
             join('sigles', 'utilisateurs.sigle_id', '=', 'sigles.sigle_id')->
-            //where('fonctions.fonction_id', 1)->
+            where('fonctions.fonction_id', 1)->
             //join('provinces', 'provinces.province_id', '=', 'circonscriptions.circons_id')->
             /*join('fonctions', 'utilisateurs.fonction_id', '=', 'fonctions.fonction_id')-> //vrai
             join('circonscriptions', 'utilisateurs.circons_id', '=', 'circonscriptions.circons_id')->
